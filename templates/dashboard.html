@@ -3,7 +3,7 @@
 <div class="d-flex" style="min-height: 100vh;">
 
     <!-- Sidebar -->
-    <div class="d-flex flex-column p-3 text-white" style="width: 240px; background-color: #1a1f2e;">
+    <div class="d-flex flex-column p-3 text-white" style="width: 240px; min-height: 100vh; background-color: #1a1f2e; position: sticky; top: 0; height: 100vh; overflow-y: auto;">
         <div class="d-flex align-items-center mb-4 pb-3 border-bottom border-secondary">
             <div class="bg-primary rounded-3 p-2 me-2">
                 <i class="bi bi-car-front-fill text-white"></i>
@@ -14,13 +14,46 @@
             </div>
         </div>
         <ul class="nav nav-pills flex-column mb-auto">
-            {% for item in nav_items %}
             <li class="nav-item mb-1">
-                <a href="#" class="nav-link text-white {% if loop.first %}active{% endif %}">
-                    <i class="bi {{ item.icon }} me-2"></i>{{ item.name }}
+                <a href="#" class="nav-link text-white active" onclick="showSection('dashboard', this); return false;">
+                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
                 </a>
             </li>
-            {% endfor %}
+            <li class="nav-item mb-1">
+                <a href="#" class="nav-link text-white" onclick="showSection('email', this); return false;">
+                    <i class="bi bi-envelope me-2"></i>Email Processor
+                </a>
+            </li>
+            <li class="nav-item mb-1">
+                <a href="#" class="nav-link text-white" onclick="showSection('fleet', this); return false;">
+                    <i class="bi bi-car-front me-2"></i>Fleet Management
+                </a>
+            </li>
+            <li class="nav-item mb-1">
+                <a href="#" class="nav-link text-white" onclick="showSection('branches', this); return false;">
+                    <i class="bi bi-geo-alt me-2"></i>Branches
+                </a>
+            </li>
+            <li class="nav-item mb-1">
+                <a href="#" class="nav-link text-white" onclick="showSection('bookings', this); return false;">
+                    <i class="bi bi-file-text me-2"></i>Bookings
+                </a>
+            </li>
+            <li class="nav-item mb-1">
+                <a href="#" class="nav-link text-white" onclick="showSection('calendar', this); return false;">
+                    <i class="bi bi-calendar me-2"></i>Calendar
+                </a>
+            </li>
+            <li class="nav-item mb-1">
+                <a href="#" class="nav-link text-white" onclick="showSection('analytics', this); return false;">
+                    <i class="bi bi-bar-chart me-2"></i>Analytics
+                </a>
+            </li>
+            <li class="nav-item mb-1">
+                <a href="#" class="nav-link text-white" onclick="showSection('konkurencija', this); return false;">
+                    <i class="bi bi-graph-up me-2"></i>Konkurencija
+                </a>
+            </li>
         </ul>
         <div class="border-top border-secondary pt-3 mt-3">
             <a href="/logout" class="nav-link text-muted">
@@ -29,30 +62,798 @@
         </div>
     </div>
 
-    <!-- Main content -->
-    <div class="flex-grow-1 p-4">
-        <h2 class="fw-bold mb-1">Dashboard</h2>
-        <p class="text-muted mb-4">AI-powered rental booking system</p>
+    <!-- Main Content -->
+    <div class="flex-grow-1" style="overflow-y: auto;">
 
-        <div class="row g-4">
-            {% for stat in stats %}
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm h-100" style="border-top: 3px solid #6f42c1 !important;">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <small class="text-muted fw-semibold">{{ stat.title }}</small>
-                            <div class="bg-light rounded-3 p-2">
-                                <i class="bi {{ stat.icon }} text-primary fs-5"></i>
+        <!-- Dashboard Section -->
+        <div id="section-dashboard" class="content-section p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Dashboard</h2>
+                    <p class="text-muted mb-0">AI-powered rental booking system</p>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="refreshSection('dashboard')">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                </button>
+            </div>
+            <div class="row g-4">
+                {% for stat in stats %}
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100" style="border-top: 3px solid #6f42c1 !important;">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <small class="text-muted fw-semibold">{{ stat.title }}</small>
+                                <div class="bg-light rounded-3 p-2">
+                                    <i class="bi {{ stat.icon }} text-primary fs-5"></i>
+                                </div>
                             </div>
+                            <h2 class="fw-bold mb-1">{{ stat.value }}</h2>
+                            <small class="text-success"><i class="bi bi-graph-up-arrow me-1"></i>{{ stat.subtitle }}</small>
                         </div>
-                        <h2 class="fw-bold mb-1">{{ stat.value }}</h2>
-                        <small class="text-success"><i class="bi bi-graph-up-arrow me-1"></i>{{ stat.subtitle }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Email Processor Section -->
+        <div id="section-email" class="content-section p-4 d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Email Processor</h2>
+                    <p class="text-muted mb-0">Manage incoming and outgoing emails</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary btn-sm" onclick="openEmailModal()">
+                        <i class="bi bi-plus me-1"></i>New Email
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="refreshSection('email')">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr><th>From</th><th>Subject</th><th>Date</th><th>Status</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody id="email-table-body"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-            {% endfor %}
+        </div>
+
+        <!-- Fleet Management Section -->
+        <div id="section-fleet" class="content-section p-4 d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Fleet Management</h2>
+                    <p class="text-muted mb-0">Overview of all vehicles — click a card for details</p>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="refreshSection('fleet')">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                </button>
+            </div>
+            <div id="fleet-grid" class="row g-3"></div>
+        </div>
+
+        <!-- Branches Section -->
+        <div id="section-branches" class="content-section p-4 d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Branches</h2>
+                    <p class="text-muted mb-0">Branch locations and details</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary btn-sm" onclick="openBranchModal()">
+                        <i class="bi bi-plus me-1"></i>Add Branch
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="refreshSection('branches')">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="card border-0 shadow-sm mb-4">
+                <div id="branches-map" style="height: 350px; border-radius: 8px;"></div>
+            </div>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr><th>Name</th><th>City</th><th>Address</th><th>Phone</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody id="branches-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookings Section -->
+        <div id="section-bookings" class="content-section p-4 d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Bookings</h2>
+                    <p class="text-muted mb-0">Manage rental bookings</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary btn-sm" onclick="openBookingModal()">
+                        <i class="bi bi-plus me-1"></i>New Booking
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="refreshSection('bookings')">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr><th>ID</th><th>Customer</th><th>Vehicle</th><th>From</th><th>To</th><th>Status</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody id="bookings-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Section -->
+        <div id="section-calendar" class="content-section p-4 d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Calendar</h2>
+                    <p class="text-muted mb-0">Bookings and events overview</p>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="refreshSection('calendar')">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                </button>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <button class="btn btn-sm btn-outline-secondary" onclick="prevMonth()"><i class="bi bi-chevron-left"></i></button>
+                                <h5 class="mb-0 fw-bold" id="calendar-month-year"></h5>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="nextMonth()"><i class="bi bi-chevron-right"></i></button>
+                            </div>
+                            <div id="calendar-grid"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3">Events this month</h6>
+                            <div id="events-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div id="section-analytics" class="content-section p-4 d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Analytics</h2>
+                    <p class="text-muted mb-0">Performance metrics and trends</p>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="refreshSection('analytics')">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                </button>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3">Monthly Revenue (€)</h6>
+                            <canvas id="revenueChart" height="120"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3">Fleet Status</h6>
+                            <canvas id="fleetStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3">Bookings per Month</h6>
+                            <canvas id="bookingsChart" height="80"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Konkurencija Section -->
+        <div id="section-konkurencija" class="content-section p-4 d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Konkurencija</h2>
+                    <p class="text-muted mb-0">Competitor analysis and market comparison</p>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="refreshSection('konkurencija')">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                </button>
+            </div>
+            <div id="competitors-grid" class="row g-4"></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Email Modal -->
+<div class="modal fade" id="emailModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">To</label>
+                    <input type="email" id="email-to" class="form-control" placeholder="recipient@email.com">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Subject</label>
+                    <input type="text" id="email-subject" class="form-control" placeholder="Email subject">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Body</label>
+                    <textarea id="email-body" class="form-control" rows="4" placeholder="Write your message..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="sendEmail()">Send</button>
+            </div>
         </div>
     </div>
-
 </div>
+
+<!-- Fleet Detail Modal -->
+<div class="modal fade" id="fleetModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fleet-modal-title">Vehicle Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="fleet-modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Branch Modal -->
+<div class="modal fade" id="branchModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="branch-modal-title">Add Branch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="branch-id">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" id="branch-name" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">City</label>
+                    <input type="text" id="branch-city" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Address</label>
+                    <input type="text" id="branch-address" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Phone</label>
+                    <input type="text" id="branch-phone" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveBranch()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="booking-modal-title">New Booking</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="booking-idx">
+                <div class="mb-3">
+                    <label class="form-label">Customer</label>
+                    <input type="text" id="booking-customer" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Vehicle</label>
+                    <select id="booking-vehicle" class="form-select">
+                        <option>Toyota Camry</option>
+                        <option>BMW Series 3</option>
+                        <option>Volkswagen Golf</option>
+                        <option>Mercedes C-Class</option>
+                        <option>Audi A4</option>
+                        <option>Ford Focus</option>
+                        <option>Hyundai Tucson</option>
+                        <option>Kia Sportage</option>
+                    </select>
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label class="form-label">From</label>
+                        <input type="date" id="booking-from" class="form-control">
+                    </div>
+                    <div class="col mb-3">
+                        <label class="form-label">To</label>
+                        <input type="date" id="booking-to" class="form-control">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Status</label>
+                    <select id="booking-status" class="form-select">
+                        <option>Pending</option>
+                        <option>Confirmed</option>
+                        <option>Active</option>
+                        <option>Completed</option>
+                        <option>Cancelled</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveBooking()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========== DATA ==========
+const emails = [
+    {id: 1, from: "john.doe@email.com", subject: "Booking Request #1234", date: "2026-03-05", status: "New"},
+    {id: 2, from: "jane.smith@email.com", subject: "Vehicle Return Confirmation", date: "2026-03-04", status: "Read"},
+    {id: 3, from: "mike.jones@email.com", subject: "Invoice #5678", date: "2026-03-03", status: "Replied"},
+    {id: 4, from: "sarah.wilson@email.com", subject: "Damage Report - Toyota Camry", date: "2026-03-02", status: "New"},
+    {id: 5, from: "support@insurance.com", subject: "Policy Renewal Notice", date: "2026-03-01", status: "Read"},
+];
+
+const vehicles = [
+    {id: 1, make: "Toyota", model: "Camry", plate: "ZG-123-AB", status: "Available", cls: "Economy", year: 2022, mileage: "45,200 km"},
+    {id: 2, make: "BMW", model: "Series 3", plate: "ZG-456-CD", status: "Rented", cls: "Premium", year: 2023, mileage: "12,800 km"},
+    {id: 3, make: "Volkswagen", model: "Golf", plate: "ZG-789-EF", status: "Available", cls: "Economy", year: 2021, mileage: "67,400 km"},
+    {id: 4, make: "Mercedes", model: "C-Class", plate: "ZG-321-GH", status: "Maintenance", cls: "Luxury", year: 2023, mileage: "8,900 km"},
+    {id: 5, make: "Audi", model: "A4", plate: "ZG-654-IJ", status: "Available", cls: "Premium", year: 2022, mileage: "31,100 km"},
+    {id: 6, make: "Ford", model: "Focus", plate: "ZG-987-KL", status: "Rented", cls: "Economy", year: 2021, mileage: "54,700 km"},
+    {id: 7, make: "Hyundai", model: "Tucson", plate: "ZG-147-MN", status: "Available", cls: "SUV", year: 2023, mileage: "19,300 km"},
+    {id: 8, make: "Kia", model: "Sportage", plate: "ZG-258-OP", status: "Available", cls: "SUV", year: 2022, mileage: "28,600 km"},
+];
+
+let branches = [
+    {id: 1, name: "Zagreb Center", city: "Zagreb", address: "Ilica 123", phone: "+385 1 234 5678", lat: 45.8150, lng: 15.9819},
+    {id: 2, name: "Zagreb Airport", city: "Zagreb", address: "Pleso bb", phone: "+385 1 234 5679", lat: 45.7429, lng: 16.0688},
+    {id: 3, name: "Split Center", city: "Split", address: "Marmontova 45", phone: "+385 21 234 567", lat: 43.5081, lng: 16.4402},
+    {id: 4, name: "Dubrovnik", city: "Dubrovnik", address: "Stradun 12", phone: "+385 20 234 567", lat: 42.6507, lng: 18.0944},
+    {id: 5, name: "Rijeka", city: "Rijeka", address: "Korzo 67", phone: "+385 51 234 567", lat: 45.3271, lng: 14.4422},
+];
+
+let bookings = [
+    {id: "BK-001", customer: "John Doe", vehicle: "Toyota Camry", from: "2026-03-01", to: "2026-03-05", status: "Completed"},
+    {id: "BK-002", customer: "Jane Smith", vehicle: "BMW Series 3", from: "2026-03-05", to: "2026-03-10", status: "Active"},
+    {id: "BK-003", customer: "Mike Jones", vehicle: "Volkswagen Golf", from: "2026-03-08", to: "2026-03-12", status: "Pending"},
+    {id: "BK-004", customer: "Sarah Wilson", vehicle: "Audi A4", from: "2026-03-10", to: "2026-03-15", status: "Confirmed"},
+    {id: "BK-005", customer: "Tom Brown", vehicle: "Ford Focus", from: "2026-03-12", to: "2026-03-14", status: "Active"},
+];
+
+const calendarEvents = [
+    {date: "2026-03-01", title: "BK-001 Start", color: "success"},
+    {date: "2026-03-05", title: "BK-001 End / BK-002 Start", color: "primary"},
+    {date: "2026-03-08", title: "BK-003 Start", color: "success"},
+    {date: "2026-03-10", title: "BK-002 End / BK-004 Start", color: "primary"},
+    {date: "2026-03-12", title: "BK-003 End / BK-005 Start", color: "success"},
+    {date: "2026-03-14", title: "BK-005 End", color: "danger"},
+    {date: "2026-03-15", title: "BK-004 End", color: "danger"},
+    {date: "2026-03-20", title: "Fleet Maintenance Day", color: "warning"},
+];
+
+const competitors = [
+    {name: "AutoRent", rating: 4.2, dailyPrice: 45, marketShare: 28, vehicles: 120, trend: "+3%"},
+    {name: "DriveEasy", rating: 3.8, dailyPrice: 38, marketShare: 18, vehicles: 85, trend: "-1%"},
+    {name: "SpeedRent", rating: 4.5, dailyPrice: 55, marketShare: 22, vehicles: 95, trend: "+5%"},
+    {name: "EcoRide", rating: 4.0, dailyPrice: 35, marketShare: 12, vehicles: 60, trend: "+1%"},
+];
+
+// ========== NAVIGATION ==========
+function showSection(name, el) {
+    document.querySelectorAll('.content-section').forEach(s => s.classList.add('d-none'));
+    document.getElementById('section-' + name).classList.remove('d-none');
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    if (el) el.classList.add('active');
+    if (name === 'email') renderEmails();
+    if (name === 'fleet') renderFleet();
+    if (name === 'branches') { renderBranchesTable(); initMap(); }
+    if (name === 'bookings') renderBookings();
+    if (name === 'calendar') renderCalendar();
+    if (name === 'analytics') initCharts();
+    if (name === 'konkurencija') renderCompetitors();
+}
+
+function refreshSection(name) {
+    if (name === 'email') renderEmails();
+    if (name === 'fleet') renderFleet();
+    if (name === 'branches') renderBranchesTable();
+    if (name === 'bookings') renderBookings();
+    if (name === 'calendar') renderCalendar();
+    if (name === 'analytics') { chartsInitialized = false; initCharts(); }
+    if (name === 'konkurencija') renderCompetitors();
+}
+
+// ========== EMAIL ==========
+function renderEmails() {
+    const statusColors = {New: 'primary', Read: 'secondary', Replied: 'success'};
+    document.getElementById('email-table-body').innerHTML = emails.map(e => `
+        <tr>
+            <td>${e.from}</td>
+            <td>${e.subject}</td>
+            <td>${e.date}</td>
+            <td><span class="badge bg-${statusColors[e.status]}">${e.status}</span></td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary me-1" title="Mark Read" onclick="markEmailRead(${e.id})"><i class="bi bi-check2"></i></button>
+                <button class="btn btn-sm btn-outline-danger" title="Delete" onclick="deleteEmail(${e.id})"><i class="bi bi-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function markEmailRead(id) {
+    const e = emails.find(e => e.id === id);
+    if (e) e.status = 'Read';
+    renderEmails();
+}
+
+function deleteEmail(id) {
+    const idx = emails.findIndex(e => e.id === id);
+    if (idx > -1) emails.splice(idx, 1);
+    renderEmails();
+}
+
+function openEmailModal() {
+    ['email-to','email-subject','email-body'].forEach(id => document.getElementById(id).value = '');
+    new bootstrap.Modal(document.getElementById('emailModal')).show();
+}
+
+function sendEmail() {
+    const to = document.getElementById('email-to').value;
+    const subject = document.getElementById('email-subject').value;
+    if (!to || !subject) return;
+    emails.unshift({id: Date.now(), from: 'me → ' + to, subject, date: new Date().toISOString().split('T')[0], status: 'Replied'});
+    bootstrap.Modal.getInstance(document.getElementById('emailModal')).hide();
+    renderEmails();
+}
+
+// ========== FLEET ==========
+function renderFleet() {
+    const statusColors = {Available: 'success', Rented: 'primary', Maintenance: 'warning'};
+    document.getElementById('fleet-grid').innerHTML = vehicles.map(v => `
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm h-100" style="cursor:pointer;" onclick="showVehicleDetail(${v.id})">
+                <div class="card-body text-center p-4">
+                    <div class="bg-light rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-car-front fs-3 text-primary"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1">${v.make} ${v.model}</h6>
+                    <small class="text-muted d-block mb-2">${v.plate}</small>
+                    <span class="badge bg-${statusColors[v.status]} mb-2">${v.status}</span>
+                    <div><small class="text-muted">${v.cls} · ${v.year}</small></div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function showVehicleDetail(id) {
+    const v = vehicles.find(v => v.id === id);
+    const statusColors = {Available: 'success', Rented: 'primary', Maintenance: 'warning'};
+    document.getElementById('fleet-modal-title').textContent = v.make + ' ' + v.model;
+    document.getElementById('fleet-modal-body').innerHTML = `
+        <div class="text-center mb-4">
+            <div class="bg-light rounded-circle d-inline-flex p-4 mb-2">
+                <i class="bi bi-car-front fs-1 text-primary"></i>
+            </div><br>
+            <span class="badge bg-${statusColors[v.status]}">${v.status}</span>
+        </div>
+        <table class="table table-sm">
+            <tr><th>Make / Model</th><td>${v.make} ${v.model}</td></tr>
+            <tr><th>Year</th><td>${v.year}</td></tr>
+            <tr><th>License Plate</th><td>${v.plate}</td></tr>
+            <tr><th>Class</th><td>${v.cls}</td></tr>
+            <tr><th>Mileage</th><td>${v.mileage}</td></tr>
+        </table>
+    `;
+    new bootstrap.Modal(document.getElementById('fleetModal')).show();
+}
+
+// ========== BRANCHES ==========
+let map = null;
+
+function initMap() {
+    if (map) return;
+    map = L.map('branches-map').setView([44.8, 16.5], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    branches.forEach(b => {
+        L.marker([b.lat, b.lng]).addTo(map).bindPopup(`<b>${b.name}</b><br>${b.address}<br>${b.phone}`);
+    });
+}
+
+function renderBranchesTable() {
+    document.getElementById('branches-table-body').innerHTML = branches.map(b => `
+        <tr>
+            <td>${b.name}</td><td>${b.city}</td><td>${b.address}</td><td>${b.phone}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary me-1" onclick="editBranch(${b.id})"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteBranch(${b.id})"><i class="bi bi-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function openBranchModal() {
+    document.getElementById('branch-id').value = '';
+    ['branch-name','branch-city','branch-address','branch-phone'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('branch-modal-title').textContent = 'Add Branch';
+    new bootstrap.Modal(document.getElementById('branchModal')).show();
+}
+
+function editBranch(id) {
+    const b = branches.find(b => b.id === id);
+    document.getElementById('branch-id').value = b.id;
+    document.getElementById('branch-name').value = b.name;
+    document.getElementById('branch-city').value = b.city;
+    document.getElementById('branch-address').value = b.address;
+    document.getElementById('branch-phone').value = b.phone;
+    document.getElementById('branch-modal-title').textContent = 'Edit Branch';
+    new bootstrap.Modal(document.getElementById('branchModal')).show();
+}
+
+function saveBranch() {
+    const id = document.getElementById('branch-id').value;
+    const data = {
+        name: document.getElementById('branch-name').value,
+        city: document.getElementById('branch-city').value,
+        address: document.getElementById('branch-address').value,
+        phone: document.getElementById('branch-phone').value,
+    };
+    if (id) {
+        Object.assign(branches.find(b => b.id == id), data);
+    } else {
+        branches.push({id: Date.now(), lat: 45.0, lng: 16.0, ...data});
+    }
+    bootstrap.Modal.getInstance(document.getElementById('branchModal')).hide();
+    renderBranchesTable();
+}
+
+function deleteBranch(id) {
+    branches.splice(branches.findIndex(b => b.id === id), 1);
+    renderBranchesTable();
+}
+
+// ========== BOOKINGS ==========
+function renderBookings() {
+    const statusColors = {Pending: 'warning', Confirmed: 'info', Active: 'primary', Completed: 'success', Cancelled: 'danger'};
+    document.getElementById('bookings-table-body').innerHTML = bookings.map((b, i) => `
+        <tr>
+            <td><code>${b.id}</code></td>
+            <td>${b.customer}</td><td>${b.vehicle}</td><td>${b.from}</td><td>${b.to}</td>
+            <td><span class="badge bg-${statusColors[b.status]}">${b.status}</span></td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary me-1" onclick="editBooking(${i})"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteBooking(${i})"><i class="bi bi-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function openBookingModal() {
+    document.getElementById('booking-idx').value = '';
+    ['booking-customer','booking-from','booking-to'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('booking-modal-title').textContent = 'New Booking';
+    new bootstrap.Modal(document.getElementById('bookingModal')).show();
+}
+
+function editBooking(idx) {
+    const b = bookings[idx];
+    document.getElementById('booking-idx').value = idx;
+    document.getElementById('booking-customer').value = b.customer;
+    document.getElementById('booking-vehicle').value = b.vehicle;
+    document.getElementById('booking-from').value = b.from;
+    document.getElementById('booking-to').value = b.to;
+    document.getElementById('booking-status').value = b.status;
+    document.getElementById('booking-modal-title').textContent = 'Edit Booking';
+    new bootstrap.Modal(document.getElementById('bookingModal')).show();
+}
+
+function saveBooking() {
+    const idx = document.getElementById('booking-idx').value;
+    const data = {
+        customer: document.getElementById('booking-customer').value,
+        vehicle: document.getElementById('booking-vehicle').value,
+        from: document.getElementById('booking-from').value,
+        to: document.getElementById('booking-to').value,
+        status: document.getElementById('booking-status').value,
+    };
+    if (idx !== '') {
+        Object.assign(bookings[idx], data);
+    } else {
+        data.id = 'BK-' + String(bookings.length + 1).padStart(3, '0');
+        bookings.push(data);
+    }
+    bootstrap.Modal.getInstance(document.getElementById('bookingModal')).hide();
+    renderBookings();
+}
+
+function deleteBooking(idx) {
+    bookings.splice(idx, 1);
+    renderBookings();
+}
+
+// ========== CALENDAR ==========
+let calYear = 2026, calMonth = 2;
+
+function renderCalendar() {
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('calendar-month-year').textContent = monthNames[calMonth] + ' ' + calYear;
+    const firstDay = new Date(calYear, calMonth, 1).getDay();
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    let html = '<div class="row text-center mb-2">';
+    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
+        html += `<div class="col fw-bold text-muted small">${d}</div>`;
+    });
+    html += '</div>';
+    let dayCount = 1;
+    for (let i = 0; i < 6; i++) {
+        if (dayCount > daysInMonth) break;
+        html += '<div class="row mb-1">';
+        for (let j = 0; j < 7; j++) {
+            const cellNum = i * 7 + j;
+            if (cellNum < firstDay || dayCount > daysInMonth) {
+                html += '<div class="col p-1"><div style="min-height:60px;"></div></div>';
+            } else {
+                const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(dayCount).padStart(2,'0')}`;
+                const dayEvents = calendarEvents.filter(e => e.date === dateStr);
+                const isToday = dateStr === '2026-03-06';
+                html += `<div class="col p-1">
+                    <div class="p-1 rounded" style="min-height:60px; border:1px solid #eee; background:${isToday ? '#6f42c1' : '#fff'}; color:${isToday ? '#fff' : 'inherit'};">
+                        <div class="small fw-bold mb-1">${dayCount}</div>
+                        ${dayEvents.map(e => `<div class="badge bg-${e.color} w-100 text-truncate mb-1" style="font-size:0.6rem;">${e.title}</div>`).join('')}
+                    </div>
+                </div>`;
+                dayCount++;
+            }
+        }
+        html += '</div>';
+    }
+    document.getElementById('calendar-grid').innerHTML = html;
+    const monthStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}`;
+    const monthEvents = calendarEvents.filter(e => e.date.startsWith(monthStr));
+    document.getElementById('events-list').innerHTML = monthEvents.length
+        ? monthEvents.map(e => `
+            <div class="d-flex align-items-center mb-2">
+                <span class="badge bg-${e.color} me-2">${e.date.split('-')[2]}</span>
+                <small>${e.title}</small>
+            </div>`).join('')
+        : '<p class="text-muted small">No events this month</p>';
+}
+
+function prevMonth() {
+    calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
+    renderCalendar();
+}
+function nextMonth() {
+    calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
+    renderCalendar();
+}
+
+// ========== ANALYTICS ==========
+let chartsInitialized = false;
+
+function initCharts() {
+    if (chartsInitialized) return;
+    chartsInitialized = true;
+    new Chart(document.getElementById('revenueChart'), {
+        type: 'line',
+        data: {
+            labels: ['Sep','Oct','Nov','Dec','Jan','Feb','Mar'],
+            datasets: [{
+                label: 'Revenue (€)', data: [42000,38000,35000,48000,52000,49000,61000],
+                borderColor: '#6f42c1', backgroundColor: 'rgba(111,66,193,0.1)', tension: 0.4, fill: true,
+            }]
+        },
+        options: {responsive: true, plugins: {legend: {display: false}}}
+    });
+    new Chart(document.getElementById('fleetStatusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Available','Rented','Maintenance'],
+            datasets: [{data: [123,28,9], backgroundColor: ['#198754','#0d6efd','#ffc107']}]
+        },
+        options: {responsive: true}
+    });
+    new Chart(document.getElementById('bookingsChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Sep','Oct','Nov','Dec','Jan','Feb','Mar'],
+            datasets: [{
+                label: 'Bookings', data: [210,195,180,240,265,248,310],
+                backgroundColor: '#0d6efd',
+            }]
+        },
+        options: {responsive: true, plugins: {legend: {display: false}}}
+    });
+}
+
+// ========== KONKURENCIJA ==========
+function renderCompetitors() {
+    document.getElementById('competitors-grid').innerHTML = competitors.map(c => {
+        const stars = '★'.repeat(Math.floor(c.rating)) + '☆'.repeat(5 - Math.floor(c.rating));
+        const trendColor = c.trend.startsWith('+') ? 'success' : 'danger';
+        return `
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="fw-bold mb-0">${c.name}</h5>
+                        <span class="badge bg-${trendColor}">${c.trend}</span>
+                    </div>
+                    <div class="text-warning mb-3">${stars} <small class="text-muted ms-1">${c.rating}/5</small></div>
+                    <div class="row text-center mb-3">
+                        <div class="col border-end">
+                            <div class="fw-bold fs-5">€${c.dailyPrice}</div>
+                            <small class="text-muted">Avg/day</small>
+                        </div>
+                        <div class="col border-end">
+                            <div class="fw-bold fs-5">${c.vehicles}</div>
+                            <small class="text-muted">Vehicles</small>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold fs-5">${c.marketShare}%</div>
+                            <small class="text-muted">Market share</small>
+                        </div>
+                    </div>
+                    <div>
+                        <small class="text-muted">Market Share</small>
+                        <div class="progress mt-1" style="height:8px;">
+                            <div class="progress-bar bg-primary" style="width:${c.marketShare}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+</script>
 {% endblock %}
