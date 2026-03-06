@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow" style="width: 380px;">
+        <div class="card-body p-4">
+            <div class="text-center mb-4">
+                <div class="bg-primary rounded-3 d-inline-flex p-2 mb-2">
+                    <i class="bi bi-car-front-fill text-white fs-4"></i>
+                </div>
+                <h4 class="fw-bold mb-0">RentACar</h4>
+                <small class="text-muted">Agent System</small>
+            </div>
+            {% if error %}
+            <div class="alert alert-danger py-2">{{ error }}</div>
+            {% endif %}
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control" required autofocus>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Sign In</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
