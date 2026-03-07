@@ -21,6 +21,10 @@ tags:
     description: Calendar events
   - name: competitors
     description: Competitor analysis
+  - name: users
+    description: User management (admin only for write operations)
+  - name: session
+    description: Current session information
 
 paths:
 
@@ -262,6 +266,92 @@ paths:
                 items:
                   $ref: '#/components/schemas/Competitor'
 
+  /api/session:
+    get:
+      tags: [session]
+      summary: Get current session user info
+      responses:
+        '200':
+          description: Current user info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionInfo'
+        '401':
+          description: Not logged in
+
+  /api/users:
+    get:
+      tags: [users]
+      summary: List all users
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      tags: [users]
+      summary: Create a new user (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Username already exists
+        '403':
+          description: Admin role required
+
+  /api/users/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    put:
+      tags: [users]
+      summary: Update a user (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '200':
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          description: Admin role required
+        '404':
+          description: User not found
+    delete:
+      tags: [users]
+      summary: Delete a user (admin only)
+      responses:
+        '204':
+          description: User deleted
+        '403':
+          description: Admin role required
+        '404':
+          description: User not found
+
 components:
   schemas:
 
@@ -423,3 +513,36 @@ components:
           type: integer
         trend:
           type: string
+
+    SessionInfo:
+      type: object
+      properties:
+        username:
+          type: string
+        role:
+          type: string
+          enum: [admin, user]
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        role:
+          type: string
+          enum: [admin, user]
+
+    UserInput:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: [admin, user]
+          default: user
