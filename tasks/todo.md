@@ -188,3 +188,33 @@
 
 ### Review
 - **dashboard.html**: Sidebar bottom block removed entirely — sidebar is now nav-only. Main content column changed to `d-flex flex-column` with a `flex-shrink-0` topbar (fixed 56px height, white background, border-bottom). User avatar, username, role badge (purple for admin, blue for user) and Logout button sit on the right side of the topbar, always visible regardless of scroll or screen size.
+
+---
+
+## Task 7: Light/Dark Theme Switcher
+
+### Plan
+- [x] git pull main
+- [x] Create GitHub issue #13
+- [x] Create branch `feature/issue-13-theme-switcher`
+- [x] Update `templates/base.html` — add inline script to apply saved theme before render (prevents flash)
+- [x] Update `templates/dashboard.html` — add sun/moon toggle button to topbar
+- [x] Commit, push, open PR
+
+### Design
+- Use Bootstrap 5.3 native dark mode (`data-bs-theme` attribute on `<html>`)
+- Default: `light`
+- Toggle: sun icon (☀) in dark mode → click → switches to light; moon icon (☾) in light mode → click → switches to dark
+- Preference saved in `localStorage` key `theme`
+- Inline `<script>` in `<head>` of `base.html` reads `localStorage` and sets `data-bs-theme` before page paint — prevents white flash on dark mode reload
+- Topbar toggle button placed left of the user avatar in the topbar
+
+### Changes per file
+| File | Change |
+|------|--------|
+| `templates/base.html` | Added `data-bs-theme="light"` to `<html>` tag; inline script in `<head>` to read `localStorage` and apply theme before render; removed hardcoded `body { background-color }` |
+| `templates/dashboard.html` | Changed topbar `bg-white` → `bg-body` (theme-aware); added moon/sun toggle button; `toggleTheme()` JS function + page-load icon sync IIFE |
+
+### Review
+- **base.html**: Inline script runs before CSS loads — sets `data-bs-theme` from `localStorage` — prevents flash of wrong theme on page reload. Default `data-bs-theme="light"` on `<html>` is the fallback when no preference is saved. Hardcoded body background removed so Bootstrap dark mode can control it.
+- **dashboard.html**: Topbar button shows moon icon in light mode, sun icon in dark mode. `toggleTheme()` reads current theme, toggles it, saves to `localStorage`, updates icon. An IIFE on page load syncs the icon to match the current theme (handles the case where the page loads already in dark mode from `localStorage`).
