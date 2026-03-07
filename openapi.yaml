@@ -1,0 +1,425 @@
+openapi: 3.0.3
+info:
+  title: RentACar Agent System API
+  description: REST API for the RentACar dashboard application
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+
+tags:
+  - name: emails
+    description: Email management
+  - name: vehicles
+    description: Fleet vehicle management
+  - name: branches
+    description: Branch location management
+  - name: bookings
+    description: Rental booking management
+  - name: events
+    description: Calendar events
+  - name: competitors
+    description: Competitor analysis
+
+paths:
+
+  /api/emails:
+    get:
+      tags: [emails]
+      summary: List all emails
+      responses:
+        '200':
+          description: List of emails
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Email'
+    post:
+      tags: [emails]
+      summary: Create a new email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailInput'
+      responses:
+        '201':
+          description: Email created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Email'
+
+  /api/emails/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    put:
+      tags: [emails]
+      summary: Update an email (e.g. mark as read)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [New, Read, Replied]
+      responses:
+        '200':
+          description: Updated email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Email'
+        '404':
+          description: Email not found
+    delete:
+      tags: [emails]
+      summary: Delete an email
+      responses:
+        '204':
+          description: Email deleted
+        '404':
+          description: Email not found
+
+  /api/vehicles:
+    get:
+      tags: [vehicles]
+      summary: List all vehicles
+      responses:
+        '200':
+          description: List of vehicles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vehicle'
+
+  /api/branches:
+    get:
+      tags: [branches]
+      summary: List all branches
+      responses:
+        '200':
+          description: List of branches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Branch'
+    post:
+      tags: [branches]
+      summary: Create a new branch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BranchInput'
+      responses:
+        '201':
+          description: Branch created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Branch'
+
+  /api/branches/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    put:
+      tags: [branches]
+      summary: Update a branch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BranchInput'
+      responses:
+        '200':
+          description: Updated branch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Branch'
+        '404':
+          description: Branch not found
+    delete:
+      tags: [branches]
+      summary: Delete a branch
+      responses:
+        '204':
+          description: Branch deleted
+        '404':
+          description: Branch not found
+
+  /api/bookings:
+    get:
+      tags: [bookings]
+      summary: List all bookings
+      responses:
+        '200':
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+    post:
+      tags: [bookings]
+      summary: Create a new booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingInput'
+      responses:
+        '201':
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+
+  /api/bookings/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    put:
+      tags: [bookings]
+      summary: Update a booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingInput'
+      responses:
+        '200':
+          description: Updated booking
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '404':
+          description: Booking not found
+    delete:
+      tags: [bookings]
+      summary: Delete a booking
+      responses:
+        '204':
+          description: Booking deleted
+        '404':
+          description: Booking not found
+
+  /api/events:
+    get:
+      tags: [events]
+      summary: List all calendar events
+      responses:
+        '200':
+          description: List of calendar events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CalendarEvent'
+
+  /api/competitors:
+    get:
+      tags: [competitors]
+      summary: List all competitors
+      responses:
+        '200':
+          description: List of competitors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Competitor'
+
+components:
+  schemas:
+
+    Email:
+      type: object
+      properties:
+        id:
+          type: integer
+        from:
+          type: string
+        subject:
+          type: string
+        date:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [New, Read, Replied]
+
+    EmailInput:
+      type: object
+      required: [from, subject, date]
+      properties:
+        from:
+          type: string
+        subject:
+          type: string
+        date:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [New, Read, Replied]
+          default: New
+
+    Vehicle:
+      type: object
+      properties:
+        id:
+          type: integer
+        make:
+          type: string
+        model:
+          type: string
+        plate:
+          type: string
+        status:
+          type: string
+          enum: [Available, Rented, Maintenance]
+        cls:
+          type: string
+        year:
+          type: integer
+        mileage:
+          type: string
+
+    Branch:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        phone:
+          type: string
+        lat:
+          type: number
+        lng:
+          type: number
+
+    BranchInput:
+      type: object
+      required: [name, city, address, phone]
+      properties:
+        name:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        phone:
+          type: string
+        lat:
+          type: number
+        lng:
+          type: number
+
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+        booking_ref:
+          type: string
+        customer:
+          type: string
+        vehicle:
+          type: string
+        from_date:
+          type: string
+          format: date
+        to_date:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [Pending, Confirmed, Active, Completed, Cancelled]
+
+    BookingInput:
+      type: object
+      required: [customer, vehicle, from_date, to_date]
+      properties:
+        customer:
+          type: string
+        vehicle:
+          type: string
+        from_date:
+          type: string
+          format: date
+        to_date:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [Pending, Confirmed, Active, Completed, Cancelled]
+          default: Pending
+
+    CalendarEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+        date:
+          type: string
+          format: date
+        title:
+          type: string
+        color:
+          type: string
+
+    Competitor:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        rating:
+          type: number
+        dailyPrice:
+          type: integer
+        marketShare:
+          type: integer
+        vehicles:
+          type: integer
+        trend:
+          type: string
