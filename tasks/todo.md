@@ -1,9 +1,131 @@
 # Todo
 
 ## Task 1: Hello World Python Script ✅
+
+### Plan
+- [x] git pull main
+- [x] Create GitHub issue #1
+- [x] Create branch `feature/issue-1-hello-world`
+- [x] Create `hello_world.py`
+- [x] Commit, push, open PR #2
+
+### Changes per file
+| File | Change |
+|------|--------|
+| `hello_world.py` | Created with `main()` function that prints "Hello, World!" |
+
+### Review
+- **hello_world.py**: Simple script with `main()` entry point pattern and `if __name__ == "__main__": main()` guard, ready for future extension.
+
+---
+
 ## Task 2: Flask Dashboard Application ✅
+
+### Plan
+- [x] git pull main
+- [x] Create GitHub issue #3
+- [x] Create branch `feature/issue-3-dashboard-app`
+- [x] Create `requirements.txt` (Flask)
+- [x] Create `app.py` — Flask app with login route and dashboard route
+- [x] Create `templates/base.html` — Bootstrap 5 base layout
+- [x] Create `templates/login.html` — login card with admin/admin credentials
+- [x] Create `templates/dashboard.html` — sidebar + stat cards
+- [x] Commit, push, open PR #4
+
+### Changes per file
+| File | Change |
+|------|--------|
+| `requirements.txt` | Added `Flask==3.0.0` |
+| `app.py` | Flask app with session-based login (admin/admin), dashboard and logout routes |
+| `templates/base.html` | Bootstrap 5.3 + Bootstrap Icons 1.11 via CDN |
+| `templates/login.html` | Centered card with RentACar branding and login form |
+| `templates/dashboard.html` | Dark sidebar (#1a1f2e), 4 stat cards, hardcoded JS nav |
+
+### Review
+- **app.py**: Session-based auth (`session["user"]`). Login checks hardcoded admin/admin, redirects to dashboard. Logout clears session.
+- **dashboard.html**: Dark sidebar with Bootstrap nav-pills. Stats rendered via Jinja2 loop from `DASHBOARD_STATS` list. Single-page JS show/hide section navigation pattern established.
+
+---
+
 ## Task 3: Dashboard Section Pages ✅
+
+### Plan
+- [x] git pull main
+- [x] Create GitHub issue #5
+- [x] Create branch `feature/issue-5-dashboard-sections`
+- [x] Update `templates/base.html` — add Chart.js 4.4 + Leaflet.js 1.9 CDN
+- [x] Update `templates/dashboard.html` — all 8 sections with JS navigation + hardcoded data
+- [x] Commit, push, open PR #6
+
+### Sections
+| Section | UI Pattern |
+|---------|-----------|
+| Dashboard | Stat cards (keep existing) |
+| Email Processor | Table with status badges, mark-read and delete actions |
+| Fleet Management | Clickable card grid, vehicle detail modal |
+| Branches | Leaflet interactive map + editable table (add/edit/delete) |
+| Bookings | Table with add/edit/delete modal form |
+| Calendar | Monthly grid calendar with event badges |
+| Analytics | Chart.js: line (revenue), doughnut (fleet status), bar (bookings) |
+| Konkurencija | Competitor comparison cards with market share progress bar |
+
+### Changes per file
+| File | Change |
+|------|--------|
+| `templates/base.html` | Added Chart.js 4.4 and Leaflet.js 1.9 via CDN |
+| `templates/dashboard.html` | 8 content sections, JS show/hide navigation, all data hardcoded in JS arrays |
+
+### Review
+- Single `dashboard.html` file with all 8 sections; JS `showSection()` hides all then shows target.
+- All data was hardcoded in JS arrays at this stage (replaced with API calls in Task 4).
+- Chart.js used for analytics (line, doughnut, bar). Leaflet.js used for branch map.
+- Refresh button on every section for UX consistency.
+
+---
+
 ## Task 4: SQLite Database + OpenAPI Spec ✅
+
+### Plan
+- [x] git pull main
+- [x] Create GitHub issue #7
+- [x] Create branch `feature/issue-7-sqlite-database`
+- [x] Update `requirements.txt` — add Flask-SQLAlchemy
+- [x] Create `models.py` — 7 SQLAlchemy models
+- [x] Create `database.py` — seed function
+- [x] Update `app.py` — init DB, CRUD API endpoints, login queries DB
+- [x] Update `templates/dashboard.html` — replace JS arrays with fetch() API calls
+- [x] Create `openapi.yaml` — OpenAPI 3.0 specification
+- [x] Commit, push, open PR #8
+
+### Models
+| Model | Fields |
+|-------|--------|
+| User | id, username, password |
+| Email | id, from_email, subject, date, status |
+| Vehicle | id, make, model, plate, status, cls, year, mileage |
+| Branch | id, name, city, address, phone, lat, lng |
+| Booking | id, booking_ref, customer, vehicle, from_date, to_date, status |
+| CalendarEvent | id, date, title, color |
+| Competitor | id, name, rating, daily_price, market_share, vehicles, trend |
+
+### Changes per file
+| File | Change |
+|------|--------|
+| `requirements.txt` | Added `Flask-SQLAlchemy==3.1.1` |
+| `models.py` | 7 SQLAlchemy models, each with `to_dict()` serializer |
+| `database.py` | `seed_data()` with guard (`if User.query.first(): return`) and sample data |
+| `app.py` | `db.init_app()`, login queries DB, CRUD endpoints for emails/branches/bookings, GET for vehicles/events/competitors |
+| `templates/dashboard.html` | Replaced all hardcoded JS arrays with `fetch()` calls via `api()` helper; added cache arrays (vehiclesCache, branchesCache, bookingsCache) |
+| `openapi.yaml` | OpenAPI 3.0 spec: all endpoints, request/response schemas |
+
+### Review
+- **models.py**: All 7 models with `to_dict()` for clean JSON serialization. No relationships (kept simple with string references).
+- **database.py**: Single `seed_data()` called at app startup. Guard prevents re-seeding on restart.
+- **app.py**: RESTful endpoints following `/api/<resource>` pattern. Login now authenticates against DB instead of hardcoded string.
+- **dashboard.html**: `api()` helper wraps fetch with JSON headers. All CRUD sections (email, branches, bookings) use full create/update/delete cycle. Fleet, events, competitors are GET-only.
+- **openapi.yaml**: Full spec covering all endpoints with schemas, request bodies, and response codes.
+
+---
 
 ## Task 5: User Management with Roles ✅
 
@@ -16,7 +138,7 @@
 - [x] Update `app.py` — user CRUD API endpoints + `/api/session` + role in session
 - [x] Update `dashboard.html` — Users section + sidebar username/role display
 - [x] Update `openapi.yaml` — add user management + session endpoints
-- [x] Commit, push, open PR
+- [x] Commit, push, open PR #10
 
 ### Role Design
 | Role  | Permissions |
@@ -35,7 +157,7 @@
 
 ### Review
 - **models.py**: Added `role = db.Column(db.String(20), nullable=False, default='user')` and `to_dict()` to User model.
-- **database.py**: Added `migrate()` function that uses `PRAGMA table_info` to safely add the `role` column to existing databases. Seed now creates `admin` (role=admin) and `operator` (role=user).
+- **database.py**: Added `migrate()` function that uses `PRAGMA table_info` to safely add the `role` column to existing databases. Also always ensures `admin` user has `role='admin'` (fixes DEFAULT 'user' migration bug). Seed now creates `admin` (role=admin) and `operator` (role=user).
 - **app.py**: Login now stores `session["role"]`. Dashboard route passes `current_user` and `current_role` to template. Added `/api/session` (GET), `/api/users` (GET/POST), `/api/users/<id>` (PUT/DELETE) — POST/PUT/DELETE check `session.get("role") != "admin"` and return 403.
-- **dashboard.html**: Sidebar bottom now shows avatar icon, username, and role badge (purple for admin, blue for user). Added Users nav item and Users section with table. JS uses `CURRENT_ROLE` variable (embedded from Flask) to show/hide Add/Edit/Delete buttons. Self-delete is disabled. User modal has username, password, and role fields.
+- **dashboard.html**: Sidebar nav wrapped in scrollable div (fixes two-column layout bug). Sidebar bottom shows avatar icon, username, and role badge (purple for admin, blue for user). Added Users nav item and Users section with table. JS uses `CURRENT_ROLE` variable (embedded from Flask) to show/hide Add/Edit/Delete buttons. Self-delete is disabled.
 - **openapi.yaml**: Added `users` and `session` tags, `/api/session`, `/api/users`, `/api/users/{id}` paths, and `User`, `UserInput`, `SessionInfo` schemas.
