@@ -3,22 +3,31 @@ from models import db, User, Email, Vehicle, Branch, Booking, CalendarEvent, Com
 
 
 def migrate():
-    """Add role column to user table if it doesn't exist."""
+    """Add role column to user table if it doesn't exist, then fix admin role."""
     with db.engine.connect() as conn:
         columns = [row[1] for row in conn.execute(text("PRAGMA table_info(user)"))]
         if "role" not in columns:
             conn.execute(text("ALTER TABLE user ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'user'"))
-            conn.commit()
+        # Ensure the admin user always has role='admin'
+        conn.execute(text("UPDATE user SET role = 'admin' WHERE username = 'admin'"))
+        conn.commit()
 
 
 def seed_data():
     migrate()
 
-    if User.query.first():
-        return  # Already seeded
+    if not User.query.first():
+        db.session.add(User(username="admin", password="admin", role="admin"))
+        db.session.add(User(username="operator", password="operator", role="user"))
 
-    db.session.add(User(username="admin", password="admin", role="admin"))
-    db.session.add(User(username="operator", password="operator", role="user"))
+    # Add operator user if it was missing from an earlier seed
+    if not User.query.filter_by(username="operator").first():
+        db.session.add(User(username="operator", password="operator", role="user"))
+
+    db.session.commit()
+
+    if Email.query.first():
+        return  # Other data already seeded
 
     for e in [
         Email(from_email="john.doe@email.com", subject="Booking Request #1234", date="2026-03-05", status="New"),
