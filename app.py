@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, abort
 from models import db, User, Email, Vehicle, Branch, Booking, CalendarEvent, Competitor
 from database import seed_data
 
@@ -49,6 +49,7 @@ def login():
         user = User.query.filter_by(username=username, password=password).first()
         if user:
             session["user"] = username
+            session["role"] = user.role
             return redirect(url_for("dashboard"))
         error = "Invalid credentials. Please try again."
     return render_template("login.html", error=error)
@@ -58,7 +59,8 @@ def login():
 def dashboard():
     if "user" not in session:
         return redirect(url_for("login"))
-    return render_template("dashboard.html", stats=DASHBOARD_STATS, nav_items=NAV_ITEMS)
+    return render_template("dashboard.html", stats=DASHBOARD_STATS, nav_items=NAV_ITEMS,
+                           current_user=session["user"], current_role=session.get("role", "user"))
 
 
 @app.route("/logout")
@@ -198,6 +200,59 @@ def get_events():
 @app.route("/api/competitors", methods=["GET"])
 def get_competitors():
     return jsonify([c.to_dict() for c in Competitor.query.all()])
+
+
+# --- API: Session ---
+
+@app.route("/api/session", methods=["GET"])
+def get_session():
+    if "user" not in session:
+        return jsonify({"error": "Not logged in"}), 401
+    return jsonify({"username": session["user"], "role": session.get("role", "user")})
+
+
+# --- API: Users ---
+
+@app.route("/api/users", methods=["GET"])
+def get_users():
+    return jsonify([u.to_dict() for u in User.query.all()])
+
+
+@app.route("/api/users", methods=["POST"])
+def create_user():
+    if session.get("role") != "admin":
+        abort(403)
+    data = request.json
+    if User.query.filter_by(username=data["username"]).first():
+        return jsonify({"error": "Username already exists"}), 400
+    user = User(username=data["username"], password=data["password"],
+                role=data.get("role", "user"))
+    db.session.add(user)
+    db.session.commit()
+    return jsonify(user.to_dict()), 201
+
+
+@app.route("/api/users/<int:id>", methods=["PUT"])
+def update_user(id):
+    if session.get("role") != "admin":
+        abort(403)
+    user = db.get_or_404(User, id)
+    data = request.json
+    for field in ["username", "password", "role"]:
+        if field in data:
+            setattr(user, field, data[field])
+    db.session.commit()
+    return jsonify(user.to_dict())
+
+
+@app.route("/api/users/<int:id>", methods=["DELETE"])
+def delete_user(id):
+    if session.get("role") != "admin":
+        abort(403)
+    user = db.get_or_404(User, id)
+    db.session.delete(user)
+    db.session.commit()
+    return "", 204
 
 
 if __name__ == "__main__":

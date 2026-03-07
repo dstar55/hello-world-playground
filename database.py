@@ -1,11 +1,24 @@
+from sqlalchemy import text
 from models import db, User, Email, Vehicle, Branch, Booking, CalendarEvent, Competitor
 
 
+def migrate():
+    """Add role column to user table if it doesn't exist."""
+    with db.engine.connect() as conn:
+        columns = [row[1] for row in conn.execute(text("PRAGMA table_info(user)"))]
+        if "role" not in columns:
+            conn.execute(text("ALTER TABLE user ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'user'"))
+            conn.commit()
+
+
 def seed_data():
+    migrate()
+
     if User.query.first():
         return  # Already seeded
 
-    db.session.add(User(username="admin", password="admin"))
+    db.session.add(User(username="admin", password="admin", role="admin"))
+    db.session.add(User(username="operator", password="operator", role="user"))
 
     for e in [
         Email(from_email="john.doe@email.com", subject="Booking Request #1234", date="2026-03-05", status="New"),
