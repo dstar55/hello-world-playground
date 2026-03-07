@@ -161,3 +161,30 @@
 - **app.py**: Login now stores `session["role"]`. Dashboard route passes `current_user` and `current_role` to template. Added `/api/session` (GET), `/api/users` (GET/POST), `/api/users/<id>` (PUT/DELETE) — POST/PUT/DELETE check `session.get("role") != "admin"` and return 403.
 - **dashboard.html**: Sidebar nav wrapped in scrollable div (fixes two-column layout bug). Sidebar bottom shows avatar icon, username, and role badge (purple for admin, blue for user). Added Users nav item and Users section with table. JS uses `CURRENT_ROLE` variable (embedded from Flask) to show/hide Add/Edit/Delete buttons. Self-delete is disabled.
 - **openapi.yaml**: Added `users` and `session` tags, `/api/session`, `/api/users`, `/api/users/{id}` paths, and `User`, `UserInput`, `SessionInfo` schemas.
+
+---
+
+## Task 6: Move User Info and Logout to Top-Right Corner
+
+### Plan
+- [x] git pull main
+- [x] Create GitHub issue #11
+- [x] Create branch `feature/issue-11-topbar-user-logout`
+- [x] Update `templates/dashboard.html`:
+  - Remove user info + logout from sidebar bottom
+  - Add topbar to main content area with user avatar, username, role badge and logout button on the right
+- [x] Commit, push, open PR
+
+### Design
+- Remove the bottom `div` (user info + logout) from the sidebar entirely
+- Add a thin topbar at the top of the main content column: white background, border-bottom, user info on the right with a Logout button
+- Sidebar becomes nav-only (logo + nav items), cleaner and without scroll concern
+- Topbar sticks to the top of the content area, always visible
+
+### Changes per file
+| File | Change |
+|------|--------|
+| `templates/dashboard.html` | Removed user info + logout from sidebar bottom; added topbar (56px, white, border-bottom) with avatar, username, role badge and Logout button on the right |
+
+### Review
+- **dashboard.html**: Sidebar bottom block removed entirely — sidebar is now nav-only. Main content column changed to `d-flex flex-column` with a `flex-shrink-0` topbar (fixed 56px height, white background, border-bottom). User avatar, username, role badge (purple for admin, blue for user) and Logout button sit on the right side of the topbar, always visible regardless of scroll or screen size.
